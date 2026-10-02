@@ -57,7 +57,7 @@ jobs:
           cp data/seen.json state-wt/seen.json
           cd state-wt
           git add seen.json
-          if git diff --cached --quiet; then
+          if [ -z "$(git status --porcelain)" ]; then
             echo "Zustand unverändert"
             exit 0
           fi
