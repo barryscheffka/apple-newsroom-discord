@@ -6,7 +6,6 @@ import {
   type WebhookPayload,
 } from "./discord.js";
 
-const ACCENT_COLOR = 0x0071e3;
 const MAX_SUMMARY = 300;
 
 /** Kürzt an einer Wortgrenze und hängt "…" an. */
@@ -24,6 +23,7 @@ export function buildMessage(
   avatarUrl: string | undefined,
 ): WebhookPayload {
   const components: Container["components"] = [];
+  const summary = truncate(article.summary, MAX_SUMMARY);
 
   if (imageUrl) {
     components.push({
@@ -32,16 +32,10 @@ export function buildMessage(
     });
   }
 
-  const summary = truncate(article.summary, MAX_SUMMARY);
   components.push(
     {
       type: ComponentType.TextDisplay,
       content: summary ? `## ${article.title}\n${summary}` : `## ${article.title}`,
-    },
-    { type: ComponentType.Separator, divider: true, spacing: 1 },
-    {
-      type: ComponentType.TextDisplay,
-      content: `-# Apple Newsroom · <t:${Math.floor(article.publishedAt.getTime() / 1000)}:D>`,
     },
     {
       type: ComponentType.ActionRow,
@@ -55,7 +49,7 @@ export function buildMessage(
     username: "Apple Newsroom",
     ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
     flags: IS_COMPONENTS_V2,
-    components: [{ type: ComponentType.Container, accent_color: ACCENT_COLOR, components }],
+    components: [{ type: ComponentType.Container, components }],
     allowed_mentions: { parse: [] },
   };
 }
