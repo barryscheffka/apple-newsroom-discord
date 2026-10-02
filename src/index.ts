@@ -49,7 +49,7 @@ async function post(
   for (const [i, article] of articles.entries()) {
     try {
       const imageUrl = await fetchOgImage(article.link);
-      await sendMessage(config.target, buildMessage(article, imageUrl, config.avatarUrl));
+      await sendMessage(config.target, buildMessage(article, imageUrl, config.avatarUrl, config.buttonLabel));
       console.log(`Gepostet: ${article.title}`);
       if (store) {
         store.add(article.id);

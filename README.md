@@ -26,6 +26,7 @@ Beim ersten Start werden alle vorhandenen Artikel als gesehen markiert und nur d
 | `POLL_INTERVAL` | Sekunden, Standard 600 |
 | `INITIAL_POST_COUNT` | Standard 1 |
 | `AVATAR_URL` | Optional, nur Webhook-Modus |
+| `BUTTON_LABEL` | Standard: „Read article“, beim deutschen Feed „Artikel lesen“ |
 
 ## Docker
 

@@ -9,6 +9,7 @@ export interface Config {
   pollIntervalMs: number;
   initialPostCount: number;
   avatarUrl?: string;
+  buttonLabel: string;
 }
 
 function intEnv(name: string, fallback: number, min: number): number {
@@ -46,9 +47,12 @@ function loadTarget(): DiscordTarget {
 }
 
 export function loadConfig(): Config {
+  const feedUrl = process.env.FEED_URL?.trim() || "https://www.apple.com/newsroom/rss-feed.rss";
+  const isGerman = /\/de\//.test(feedUrl);
   return {
     target: loadTarget(),
-    feedUrl: process.env.FEED_URL?.trim() || "https://www.apple.com/newsroom/rss-feed.rss",
+    feedUrl,
+    buttonLabel: process.env.BUTTON_LABEL?.trim() || (isGerman ? "Artikel lesen" : "Read article"),
     stateFile: process.env.STATE_FILE?.trim() || "data/seen.json",
     pollIntervalMs: intEnv("POLL_INTERVAL", 600, 10) * 1000,
     initialPostCount: intEnv("INITIAL_POST_COUNT", 1, 0),

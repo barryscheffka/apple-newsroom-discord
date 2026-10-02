@@ -21,6 +21,7 @@ export function buildMessage(
   article: Article,
   imageUrl: string | undefined,
   avatarUrl: string | undefined,
+  buttonLabel: string,
 ): WebhookPayload {
   const components: Container["components"] = [];
   const summary = truncate(article.summary, MAX_SUMMARY);
@@ -40,7 +41,7 @@ export function buildMessage(
     {
       type: ComponentType.ActionRow,
       components: [
-        { type: ComponentType.Button, style: 5, label: "Artikel lesen", url: article.link },
+        { type: ComponentType.Button, style: 5, label: buttonLabel, url: article.link },
       ],
     },
   );

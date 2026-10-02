@@ -46,6 +46,7 @@ jobs:
           DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           FEED_URL: ${{ vars.FEED_URL }}
+          BUTTON_LABEL: ${{ vars.BUTTON_LABEL }}
           STATE_FILE: data/seen.json
           # Geht der Zustand je verloren: nichts nachposten, nur neu aufsetzen
           INITIAL_POST_COUNT: "0"
