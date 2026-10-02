@@ -1,0 +1,67 @@
+name: Post Apple Newsroom
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+# Nie zwei Läufe gleichzeitig, sonst überschreiben sie sich gegenseitig den Zustand
+concurrency:
+  group: post-newsroom
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Zustand (seen.json) liegt auf dem Branch "state", damit main sauber bleibt
+      - name: Restore state
+        run: |
+          if git ls-remote --exit-code --heads origin state >/dev/null 2>&1; then
+            git fetch --depth=1 origin state:refs/remotes/origin/state
+            git worktree add -B state state-wt origin/state
+            mkdir -p data
+            cp state-wt/seen.json data/seen.json
+          else
+            git worktree add --orphan -b state state-wt
+          fi
+
+      - name: Build and run
+        run: npm run build && node dist/index.js --once
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          FEED_URL: ${{ vars.FEED_URL }}
+          STATE_FILE: data/seen.json
+          # Geht der Zustand je verloren: nichts nachposten, nur neu aufsetzen
+          INITIAL_POST_COUNT: "0"
+
+      - name: Save state
+        if: always()
+        run: |
+          [ -f data/seen.json ] || exit 0
+          cp data/seen.json state-wt/seen.json
+          cd state-wt
+          git add seen.json
+          if git diff --cached --quiet; then
+            echo "Zustand unverändert"
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "Update seen articles"
+          git push origin HEAD:state
