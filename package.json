@@ -1,0 +1,25 @@
+{
+  "name": "apple-newsroom-discord",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Posts new Apple Newsroom articles to a Discord webhook using Components V2",
+  "type": "module",
+  "engines": {
+    "node": ">=20.6"
+  },
+  "scripts": {
+    "dev": "tsx watch --env-file=.env src/index.ts",
+    "once": "tsx --env-file=.env src/index.ts --once",
+    "build": "tsc",
+    "start": "node --env-file=.env dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "rss-parser": "^3.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
