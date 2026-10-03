@@ -1,10 +1,7 @@
 # Apple Newsroom → Discord
 
 Posts new [Apple Newsroom](https://www.apple.com/newsroom/) articles to a Discord channel using
-[Components V2](https://discord.com/developers/docs/components/overview) – no classic embeds, no link previews.
-
-Each message is a container with the article's `og:image`, the title, a short summary and a
-"Read article" link button. Messages are sent either by a **bot** (`DISCORD_BOT_TOKEN` +
+[Components V2](https://discord.com/developers/docs/components/overview). Messages are sent either by a **bot** (`DISCORD_BOT_TOKEN` +
 `DISCORD_CHANNEL_ID`) or through a **webhook** (`DISCORD_WEBHOOK_URL`).
 
 > Unofficial project, not affiliated with or endorsed by Apple or Discord.
