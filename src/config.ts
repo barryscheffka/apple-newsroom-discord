@@ -17,7 +17,7 @@ function intEnv(name: string, fallback: number, min: number): number {
   if (!raw) return fallback;
   const value = Number(raw);
   if (!Number.isInteger(value) || value < min) {
-    throw new Error(`${name} muss eine ganze Zahl >= ${min} sein (erhalten: "${raw}")`);
+    throw new Error(`${name} must be an integer >= ${min} (got: "${raw}")`);
   }
   return value;
 }
@@ -28,20 +28,20 @@ function loadTarget(): DiscordTarget {
 
   if (token || channelId) {
     if (!token || !channelId) {
-      throw new Error("Für den Bot-Modus müssen DISCORD_BOT_TOKEN und DISCORD_CHANNEL_ID gesetzt sein");
+      throw new Error("Bot mode requires both DISCORD_BOT_TOKEN and DISCORD_CHANNEL_ID");
     }
-    if (!/^\d{15,25}$/.test(channelId)) throw new Error("DISCORD_CHANNEL_ID muss eine numerische ID sein");
+    if (!/^\d{15,25}$/.test(channelId)) throw new Error("DISCORD_CHANNEL_ID must be a numeric ID");
     return { kind: "bot", token, channelId };
   }
 
   const url = process.env.DISCORD_WEBHOOK_URL?.trim();
   if (!url) {
-    throw new Error("Weder DISCORD_BOT_TOKEN + DISCORD_CHANNEL_ID noch DISCORD_WEBHOOK_URL gesetzt");
+    throw new Error("Set either DISCORD_BOT_TOKEN + DISCORD_CHANNEL_ID or DISCORD_WEBHOOK_URL");
   }
   try {
-    if (new URL(url).protocol !== "https:") throw new Error("kein https");
+    if (new URL(url).protocol !== "https:") throw new Error("not https");
   } catch {
-    throw new Error("DISCORD_WEBHOOK_URL ist keine gültige https-URL");
+    throw new Error("DISCORD_WEBHOOK_URL is not a valid https URL");
   }
   return { kind: "webhook", url };
 }

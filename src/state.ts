@@ -11,7 +11,7 @@ export class SeenStore {
   private constructor(
     private readonly file: string,
     ids: string[],
-    /** true, wenn die State-Datei beim Start noch nicht existierte */
+    /** true if the state file did not exist at startup */
     readonly isFirstRun: boolean,
   ) {
     this.ids = ids;

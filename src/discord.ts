@@ -1,6 +1,6 @@
 import type { DiscordTarget } from "./config.js";
 
-// Schlanke Typen für Discord Components V2 – nur die Teile, die für Webhooks relevant sind.
+// Lean types for Discord Components V2 – only the parts relevant for webhooks and bot messages.
 
 export const IS_COMPONENTS_V2 = 1 << 15;
 
@@ -15,7 +15,7 @@ export enum ComponentType {
   Container = 17,
 }
 
-/** Link-Button (style 5) – einziger Button-Typ, den Webhooks ohne App nutzen dürfen. */
+/** Link button (style 5) – the only button type allowed for webhooks not owned by an app. */
 export interface LinkButton {
   type: ComponentType.Button;
   style: 5;
@@ -52,7 +52,7 @@ export interface Container {
 
 export type TopLevelComponent = Container | ActionRow | TextDisplay | MediaGallery | Separator;
 
-/** Mit IS_COMPONENTS_V2 dürfen weder `content` noch `embeds` gesetzt sein. */
+/** With IS_COMPONENTS_V2 set, neither `content` nor `embeds` may be present. */
 export interface WebhookPayload {
   username?: string;
   avatar_url?: string;
@@ -66,8 +66,8 @@ const MAX_ATTEMPTS = 5;
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 /**
- * Sendet die Nachricht per Webhook oder als Bot in einen Channel.
- * Webhook: wait + with_components nötig. Bot: username/avatar_url gibt es nicht (Bot-Identität).
+ * Sends the message via webhook or as a bot into a channel.
+ * Webhook: needs wait + with_components. Bot: no username/avatar_url (uses the bot identity).
  */
 export async function sendMessage(target: DiscordTarget, payload: WebhookPayload): Promise<void> {
   let url: URL;
@@ -77,7 +77,7 @@ export async function sendMessage(target: DiscordTarget, payload: WebhookPayload
   if (target.kind === "webhook") {
     url = new URL(target.url);
     url.searchParams.set("wait", "true");
-    // Ohne with_components ignoriert Discord das components-Feld bei App-fremden Webhooks.
+    // Without with_components, Discord ignores the components field for webhooks not owned by an app.
     url.searchParams.set("with_components", "true");
   } else {
     url = new URL(`https://discord.com/api/v10/channels/${target.channelId}/messages`);
@@ -100,14 +100,14 @@ export async function sendMessage(target: DiscordTarget, payload: WebhookPayload
       const rateLimit = (await res.json().catch(() => ({}))) as { retry_after?: number };
       const headerValue = Number(res.headers.get("retry-after"));
       const retryAfter = rateLimit.retry_after ?? (Number.isFinite(headerValue) ? headerValue : 1);
-      console.warn(`Rate-Limit, warte ${retryAfter}s (Versuch ${attempt}/${MAX_ATTEMPTS})`);
+      console.warn(`Rate limited, waiting ${retryAfter}s (attempt ${attempt}/${MAX_ATTEMPTS})`);
       await sleep(Math.ceil(retryAfter * 1000) + 100);
       continue;
     }
 
     const text = await res.text().catch(() => "");
-    throw new Error(`Discord antwortete ${res.status}: ${text.slice(0, 500)}`);
+    throw new Error(`Discord responded with ${res.status}: ${text.slice(0, 500)}`);
   }
 
-  throw new Error(`Discord nach ${MAX_ATTEMPTS} Versuchen nicht erfolgreich`);
+  throw new Error(`Discord request failed after ${MAX_ATTEMPTS} attempts`);
 }

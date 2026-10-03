@@ -5,7 +5,7 @@ on:
     - cron: "*/10 * * * *"
   workflow_dispatch:
 
-# Nie zwei Läufe gleichzeitig, sonst überschreiben sie sich gegenseitig den Zustand
+# Never run two jobs at once, otherwise they overwrite each other's state
 concurrency:
   group: post-newsroom
   cancel-in-progress: false
@@ -27,7 +27,7 @@ jobs:
 
       - run: npm ci
 
-      # Zustand (seen.json) liegt auf dem Branch "state", damit main sauber bleibt
+      # State (seen.json) lives on the "state" branch to keep main clean
       - name: Restore state
         run: |
           if git ls-remote --exit-code --heads origin state >/dev/null 2>&1; then
@@ -48,7 +48,7 @@ jobs:
           FEED_URL: ${{ vars.FEED_URL }}
           BUTTON_LABEL: ${{ vars.BUTTON_LABEL }}
           STATE_FILE: data/seen.json
-          # Geht der Zustand je verloren: nichts nachposten, nur neu aufsetzen
+          # If the state is ever lost: don't repost anything, just start over
           INITIAL_POST_COUNT: "0"
 
       - name: Save state
@@ -59,7 +59,7 @@ jobs:
           cd state-wt
           git add seen.json
           if [ -z "$(git status --porcelain)" ]; then
-            echo "Zustand unverändert"
+            echo "State unchanged"
             exit 0
           fi
           git -c user.name="github-actions[bot]" \

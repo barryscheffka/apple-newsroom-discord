@@ -44,7 +44,7 @@ export function stripHtml(input: string): string {
     .trim();
 }
 
-/** Liest den Feed und liefert Artikel sortiert von alt nach neu. */
+/** Reads the feed and returns articles sorted oldest to newest. */
 export async function fetchArticles(feedUrl: string): Promise<Article[]> {
   const feed = await parser.parseURL(feedUrl);
   const articles: Article[] = [];
@@ -59,7 +59,7 @@ export async function fetchArticles(feedUrl: string): Promise<Article[]> {
       id: item.id ?? item.guid ?? link,
       title,
       link,
-      // Atom-Feed von Apple liefert <content>, kein <summary>
+      // Apple's Atom feed provides <content>, not <summary>
       summary: stripHtml(item.summary ?? item.contentSnippet ?? item.content ?? ""),
       publishedAt: Number.isNaN(date.getTime()) ? new Date() : date,
     });

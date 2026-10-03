@@ -3,7 +3,7 @@ const OG_IMAGE_PATTERNS = [
   /<meta[^>]+content=["']([^"']+)["'][^>]*(?:property|name)=["']og:image(?::secure_url)?["']/i,
 ];
 
-/** Holt das og:image von der Artikelseite. Gibt bei jedem Fehler undefined zurück. */
+/** Fetches og:image from the article page. Returns undefined on any error. */
 export async function fetchOgImage(articleUrl: string): Promise<string | undefined> {
   try {
     const res = await fetch(articleUrl, {
@@ -12,7 +12,7 @@ export async function fetchOgImage(articleUrl: string): Promise<string | undefin
     });
     if (!res.ok) return undefined;
 
-    // og:image steht im <head>, der Rest der Seite wird nicht gebraucht
+    // og:image lives in the <head>, the rest of the page is not needed
     const html = (await res.text()).slice(0, 200_000);
     for (const pattern of OG_IMAGE_PATTERNS) {
       const raw = pattern.exec(html)?.[1];
@@ -21,7 +21,7 @@ export async function fetchOgImage(articleUrl: string): Promise<string | undefin
       if (url.protocol === "https:" || url.protocol === "http:") return url.href;
     }
   } catch (err) {
-    console.warn(`og:image für ${articleUrl} nicht ladbar: ${(err as Error).message}`);
+    console.warn(`Could not load og:image for ${articleUrl}: ${(err as Error).message}`);
   }
   return undefined;
 }

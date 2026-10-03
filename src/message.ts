@@ -8,7 +8,7 @@ import {
 
 const MAX_SUMMARY = 300;
 
-/** Kürzt an einer Wortgrenze und hängt "…" an. */
+/** Truncates at a word boundary and appends "…". */
 export function truncate(text: string, max: number): string {
   if (text.length <= max) return text;
   const cut = text.slice(0, max);
